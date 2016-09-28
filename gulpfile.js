@@ -10,7 +10,7 @@ var args = require('yargs').argv;
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
 	return gulp
-		.src(['./scr/**//.js', './*.js'])
+		.src(['./scr/**/*/.js', './*.js'])
 		.pipe(gulpif(args.verbose, jscs()))
 		.pipe(jshint())
 		.pipe(jshint.reporter('jshint-stylish', {verbose: true})) //it is needed for jshint
@@ -20,6 +20,10 @@ gulp.task('vet', ['show-something'], function() {
 gulp.task('show-something', function() {
 	//if we don't use streams use  to execute it. 
 	log('Test to show dependencies');
+});
+
+gulp.task('file-watcher', function() {
+	gulp.watch('./src/**/*.js', ['show-something']);
 });
 
 /////////////////////

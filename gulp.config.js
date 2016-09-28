@@ -9,6 +9,7 @@ module.exports = function() {
 			'./*.js'
 		],
 		client: client, 
+		css: client + '/styles/*.css',
 		index: client + 'index.html', 
 		js: [
 			clientApp + '**/*.module.js',

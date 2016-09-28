@@ -32,6 +32,7 @@ gulp.task('wiredep', function() {
 	return gulp
 		.src(config.index)
 		.pipe(inject(gulp.src(config.js)))
+		.pipe(inject(gulp.src(config.css)))
 		.pipe(gulp.dest(config.client));
 });
 

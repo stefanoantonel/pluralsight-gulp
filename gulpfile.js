@@ -5,6 +5,8 @@ var util = require('gulp-util'); //allow console log functions.
 var gulpif = require('gulp-if'); // second argument is a stream not function
 var args = require('yargs').argv;
 var plumber = require('gulp-plumber'); //for error handling 
+var config = require('./gulp.config')(); //adding config to hardcoded paths make sure to excecuted using ()
+var inject = require('gulp-inject'); //to inject the js and css to the index.html
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -23,7 +25,14 @@ gulp.task('show-something', function() {
 });
 
 gulp.task('file-watcher', function() {
-	gulp.watch('./src/**/*.js', ['show-something']);
+	gulp.watch(config.alljs, ['show-something']);
+});
+
+gulp.task('wiredep', function() {
+	return gulp
+		.src(config.index)
+		.pipe(inject(gulp.src(config.js)))
+		.pipe(gulp.dest(config.client));
 });
 
 /////////////////////

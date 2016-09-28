@@ -4,10 +4,12 @@ module.exports = function() {
 
 	var config = {
 		temp: './.tmp/',
+		build: './build/',
 		alljs: [
 			'./src/**/*.js', 
 			'./*.js'
 		],
+		allclient: client + '**/*.*',
 		client: client, 
 		css: client + '/styles/*.css',
 		index: client + 'index.html', 

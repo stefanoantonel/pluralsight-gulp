@@ -5,7 +5,9 @@ var util = require('gulp-util'); //allow console log functions.
 var gulpif = require('gulp-if'); // second argument is a stream not function
 var args = require('yargs').argv;
 
-gulp.task('vet', function() {
+
+
+gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
 	return gulp
 		.src(['./scr/**//.js', './*.js'])
@@ -14,6 +16,13 @@ gulp.task('vet', function() {
 		.pipe(jshint.reporter('jshint-stylish', {verbose: true})) //it is needed for jshint
 		.pipe(jshint.reporter('fail'));
 });
+
+gulp.task('show-something', function() {
+	//if we don't use streams use  to execute it. 
+	log('Test to show dependencies');
+});
+
+/////////////////////
 
 function log(msg) {
 	if(typeof(msg) === 'object') {

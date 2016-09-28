@@ -74,6 +74,20 @@ gulp.task('templatecache', ['clean-build'], function() {
 		))
 		.pipe(gulp.dest(config.build))
 });
+
+gulp.task('optimize', ['inject', 'templatecache'], function() {
+	log('Optimizing the javascript, css, html');
+
+	var templateCache = config.build + config.templatecache.file;
+	return gulp
+		.src(config.index)
+		.pipe(plumber()) //error handling
+		.pipe(inject(gulp.src(templateCache, {read: false}), { 
+			//get the compressed file and inject in the tag 
+			starttag: '<!-- inject:templates:js -->'
+		}))
+		.pipe(gulp.dest(config.build));
+});
 /////////////////////
 
 function log(msg) {

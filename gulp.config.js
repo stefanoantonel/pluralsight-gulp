@@ -27,7 +27,7 @@ module.exports = function() {
 		htmltemplates: clientApp + '**/*.html', //avoid the index.html
 
 		templatecache: {
-			file: 'templates.js',
+			file: 'templates.min.js',
 			options: {
 				module: 'app.core',
 				standAlone: false, //if is a new module for cache use true

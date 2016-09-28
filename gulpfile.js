@@ -14,6 +14,7 @@ var minifyHtml = require('gulp-minify-html');
 var uglify = require('gulp-uglify');
 var csso = require('gulp-csso');
 var concat = require('gulp-concat');
+var ngannotate = require('gulp-ng-annotate');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -112,7 +113,8 @@ gulp.task('optimize-customjs', ['clean-build'], function() {
 	return gulp
 		.src(config.js)
 		.pipe(plumber()) //error handling
-		.pipe(concat(config.minify.js))
+		.pipe(ngannotate())
+		.pipe(concat(config.minify.js))						
 		.pipe(uglify())
 		.pipe(gulp.dest(config.build));
 });

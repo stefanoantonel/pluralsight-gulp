@@ -4,14 +4,14 @@ var jscs = require('gulp-jscs');
 var util = require('gulp-util'); //allow console log functions.
 var gulpif = require('gulp-if'); // second argument is a stream not function
 var args = require('yargs').argv;
-
-
+var plumber = require('gulp-plumber'); //for error handling 
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
 	return gulp
 		.src(['./scr/**/*/.js', './*.js'])
 		.pipe(gulpif(args.verbose, jscs()))
+		.pipe(plumber())
 		.pipe(jshint())
 		.pipe(jshint.reporter('jshint-stylish', {verbose: true})) //it is needed for jshint
 		.pipe(jshint.reporter('fail'));

@@ -29,6 +29,7 @@
     "gulp-if": "^2.0.1",
     "gulp-jscs": "^4.0.0",
     "gulp-jshint": "^2.0.1",
+    "gulp-plumber": "^1.1.0",
     "gulp-util": "^3.0.7",
     "jshint": "^2.9.3",
     "jshint-stylish": "^2.2.1",

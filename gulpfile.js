@@ -9,6 +9,8 @@ var config = require('./gulp.config')(); //adding config to hardcoded paths make
 var inject = require('gulp-inject'); //to inject the js and css to the index.html
 var clean = require('gulp-clean');
 var imagemin = require('gulp-imagemin');
+var templatecache = require('gulp-angular-templatecache');
+var minifyHtml = require('gulp-minify-html');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -59,6 +61,18 @@ gulp.task('images', ['clean-build'], function() {
 		.on('end', function(){ log('Images folder: ' + config.images); })
 		.pipe(imagemin())
 		.pipe(gulp.dest(config.build + 'images'))
+});
+
+gulp.task('templatecache', ['clean-build'], function() {
+	log('Creating AngularJS $templatecache');
+	return gulp
+		.src(config.htmltemplates)
+		.pipe(minifyHtml({empty: true})) //true to conserv the empty tags, use allways true
+		.pipe(templatecache(
+			config.templatecache.file, //destination file
+			config.templatecache.options
+		))
+		.pipe(gulp.dest(config.build))
 });
 /////////////////////
 

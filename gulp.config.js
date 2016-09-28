@@ -23,7 +23,17 @@ module.exports = function() {
 			clientApp + '**/*.module.js',
 			clientApp + '**/*.js',
 			'!' + clientApp + '**/*.spec.js',
-		]
+		], 
+		htmltemplates: clientApp + '**/*.html', //avoid the index.html
+
+		templatecache: {
+			file: 'templates.js',
+			options: {
+				module: 'app.core',
+				standAlone: false, //if is a new module for cache use true
+				root: 'app/'
+			}
+		}
 	};
 
 	return config;

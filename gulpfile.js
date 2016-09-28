@@ -7,6 +7,8 @@ var args = require('yargs').argv;
 var plumber = require('gulp-plumber'); //for error handling 
 var config = require('./gulp.config')(); //adding config to hardcoded paths make sure to excecuted using ()
 var inject = require('gulp-inject'); //to inject the js and css to the index.html
+var clean = require('gulp-clean');
+var imagemin = require('gulp-imagemin');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -36,13 +38,28 @@ gulp.task('inject', function() {
 		.pipe(gulp.dest(config.client));
 });
 
-gulp.task('copy-build', ['inject'], function() {
+gulp.task('copy-build', ['inject', 'images'], function() {
 	log('Copying files to Build directory');
 	return gulp
 		.src(config.allclient)
 		.pipe(gulp.dest(config.build));
 });
 
+gulp.task('clean-build', function() {
+	log('Starting cleaning the entire build folder');
+	return gulp
+		.src(config.build, {read: false})
+        .pipe(clean());
+});
+
+gulp.task('images', ['clean-build'], function() {
+	log('Copying images and optimize them');
+	return gulp
+		.src(config.allimages)
+		.on('end', function(){ log('Images folder: ' + config.images); })
+		.pipe(imagemin())
+		.pipe(gulp.dest(config.build + 'images'))
+});
 /////////////////////
 
 function log(msg) {

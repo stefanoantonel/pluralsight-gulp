@@ -28,12 +28,19 @@ gulp.task('file-watcher', function() {
 	gulp.watch(config.alljs, ['show-something']);
 });
 
-gulp.task('wiredep', function() {
+gulp.task('inject', function() {
 	return gulp
 		.src(config.index)
 		.pipe(inject(gulp.src(config.js)))
 		.pipe(inject(gulp.src(config.css)))
 		.pipe(gulp.dest(config.client));
+});
+
+gulp.task('copy-build', ['inject'], function() {
+	log('Copying files to Build directory');
+	return gulp
+		.src(config.allclient)
+		.pipe(gulp.dest(config.build));
 });
 
 /////////////////////

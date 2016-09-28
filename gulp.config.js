@@ -6,6 +6,10 @@ module.exports = function() {
 	var config = {
 		temp: './.tmp/',
 		build: './build/',
+		minify: {
+			js: 'minify.js',
+			css: 'minify.css'
+		},
 		client: client,
 		images: images,
 		alljs: [

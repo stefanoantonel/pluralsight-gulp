@@ -11,6 +11,9 @@ var clean = require('gulp-clean');
 var imagemin = require('gulp-imagemin');
 var templatecache = require('gulp-angular-templatecache');
 var minifyHtml = require('gulp-minify-html');
+var uglify = require('gulp-uglify');
+var csso = require('gulp-csso');
+var concat = require('gulp-concat');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -88,6 +91,42 @@ gulp.task('optimize', ['inject', 'templatecache'], function() {
 		}))
 		.pipe(gulp.dest(config.build));
 });
+
+gulp.task('inject-customjs-customcss', ['optimize-customjs','optimize-customcss'], function() {
+	log('Optimizing and injecting the custom JS minified');
+	var minifyjs = config.build + config.minify.js;
+	var minifycss = config.build + config.minify.css;
+	return gulp
+		.src(config.index)
+		.pipe(inject(gulp.src(minifyjs, {read: false}), { 
+			starttag: '<!-- inject:custom:js -->'
+		}))
+		.pipe(inject(gulp.src(minifycss, {read: false}), { 
+			starttag: '<!-- inject:custom:css -->'
+		}))
+		.pipe(gulp.dest(config.build));
+});
+
+gulp.task('optimize-customjs', ['clean-build'], function() {
+	log('Minify the JS to build folder')
+	return gulp
+		.src(config.js)
+		.pipe(plumber()) //error handling
+		.pipe(concat(config.minify.js))
+		.pipe(uglify())
+		.pipe(gulp.dest(config.build));
+});
+
+gulp.task('optimize-customcss', ['clean-build'], function() {
+	log('Minify the CSS to build folder')
+	return gulp
+		.src(config.css)
+		.pipe(plumber()) //error handling
+		.pipe(concat(config.minify.css))
+		.pipe(csso())
+		.pipe(gulp.dest(config.build));
+});
+
 /////////////////////
 
 function log(msg) {
@@ -102,4 +141,3 @@ function log(msg) {
 		util.log(util.colors.blue(msg));
 	}
 }
-

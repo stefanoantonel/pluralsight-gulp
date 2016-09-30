@@ -15,6 +15,10 @@ var uglify = require('gulp-uglify');
 var csso = require('gulp-csso');
 var concat = require('gulp-concat');
 var ngannotate = require('gulp-ng-annotate');
+var rev = require('gulp-rev');
+var revreplace = require('gulp-rev-replace');
+var msbuild = require("gulp-msbuild");
+var merge = require('merge-stream');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -97,8 +101,10 @@ gulp.task('inject-customjs-customcss', ['optimize-customjs','optimize-customcss'
 	log('Optimizing and injecting the custom JS minified');
 	var minifyjs = config.build + config.minify.js;
 	var minifycss = config.build + config.minify.css;
+	var manifest = gulp.src(config.build + "rev-manifest.json");
 	return gulp
 		.src(config.index)
+		.pipe(revreplace({manifest: manifest}))
 		.pipe(inject(gulp.src(minifyjs, {read: false}), { 
 			starttag: '<!-- inject:custom:js -->'
 		}))
@@ -116,7 +122,8 @@ gulp.task('optimize-customjs', ['clean-build'], function() {
 		.pipe(ngannotate())
 		.pipe(concat(config.minify.js))						
 		.pipe(uglify())
-		.pipe(gulp.dest(config.build));
+		.pipe(rev())
+		.pipe(gulp.dest(config.build))
 });
 
 gulp.task('optimize-customcss', ['clean-build'], function() {
@@ -126,8 +133,56 @@ gulp.task('optimize-customcss', ['clean-build'], function() {
 		.pipe(plumber()) //error handling
 		.pipe(concat(config.minify.css))
 		.pipe(csso())
-		.pipe(gulp.dest(config.build));
+		.pipe(rev())
+		.pipe(gulp.dest(config.build))
 });
+
+gulp.task('clean-deploy', function() {
+	log('Cleaning the entire deploy folder');
+	return gulp
+		.src(config.deploy, {read: false})
+        .pipe(clean());
+});
+
+/* Assumptions: 
+	1) You change the locations of the projects in gulp.config.ws
+	2) You have a profile to deploy called Custom
+	3) You have the destination folder in C:\deploy\<name-of-solution-in-lowercase>
+*/
+gulp.task("build-ws", ['clean-deploy'], function(route) {
+	log('You need to see ' + config.ws.length + ' MSBuild complete!');
+	var tasks = config.ws.map(function(service) {
+		return gulp
+			.src(service)
+			.pipe(plumber())
+	        .pipe(msbuild({
+	        	targets: ['Clean', 'Build'],
+	            toolsVersion: 'auto',
+	            errorOnFail: true,
+	            properties: { DeployOnBuild: true, PublishProfile: "gulp-deploy" }
+	    	}))
+	    	.on('end', function() {
+	    		log('Deployed ' + service);
+	    	});
+	});
+	return merge(tasks);
+});
+
+gulp.task('build-clients', ['build-ws'], function() {
+	log('Copying files to Deploy directory');
+	var tasks = config.angularapps.folders.map(function(folder) {
+		
+		return gulp
+			.src(folder.base + config.angularapps.files , {base: folder.base})
+			.pipe(gulp.dest(config.deploy + folder.destination))
+			.on('end', function() {
+				log('Copied ' + folder.base);
+			});
+	})
+	return merge(tasks);
+});
+
+gulp.task('build-deploy', ['build-clients']);
 
 /////////////////////
 
@@ -135,11 +190,11 @@ function log(msg) {
 	if(typeof(msg) === 'object') {
 		for (var item in msg) {
 			if (msg.hasOwnProperty(item)) {
-				util.log(util.colors.blue(msg[item]));
+				util.log(util.colors.yellow(msg[item]));
 			}
 		}
 	}
 	else {
-		util.log(util.colors.blue(msg));
+		util.log(util.colors.yellow(msg));
 	}
 }

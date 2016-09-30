@@ -28,15 +28,34 @@ module.exports = function() {
 			clientApp + '**/*.js',
 			'!' + clientApp + '**/*.spec.js',
 		], 
-		htmltemplates: clientApp + '**/*.html', //avoid the index.html
-
-		templatecache: {
-			file: 'templates.min.js',
-			options: {
-				module: 'app.core',
-				standAlone: false, //if is a new module for cache use true
-				root: 'app/'
+		deploy: 'C:/deploy/',
+		ws: [
+			'E:/Documents/TPC/git/mobileframework-appconfigservice/AppConfigService.sln', 
+			'E:/Documents/TPC/git/mobileframework-configservice/ConfigService.sln', 
+			'E:/Documents/TPC/git/mobileframework-documentservice/DocumentService.sln', 
+			'E:/Documents/TPC/git/mobileframework-identitymanagementservice/IdentityManagementService.sln', 
+			'E:/Documents/TPC/git/mobileframework-identityservice/IdentityService.sln'
+		], 
+		angularapps: {
+			folders: [
+				{
+					base: 'E:/Documents/TPC/git/mobileapps/Home/Home/public/',
+					destination: 'Home/'
+				},
+				{
+					base: 'E:/Documents/TPC/git/mobileframework-mobileapplicationmanager/MobileApplicationManager/public/',
+					destination: 'mobileappmanager/'
+				},
+				{
+					base: 'E:/Documents/TPC/git/mobileframework-sharedcomponents/',
+					destination: 'sharedcomponents/'
+				},
+				{
+					base: 'E:/Documents/TPC/git/mobileframework-storeinformationsystem/StoreInformation/public/',
+					destination: 'storeinformation/'
 			}
+			],
+			files: '**/*.*'
 		}
 	};
 

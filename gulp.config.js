@@ -31,6 +31,7 @@ module.exports = function() {
 		deploy: 'C:/deploy/',
 		ws: [
 			'E:/Documents/TPC/git/mobileframework-appconfigservice/AppConfigService.sln', 
+			'E:/Documents/TPC/git/mobileframework-assettagservice/AssetTagService.sln',
 			'E:/Documents/TPC/git/mobileframework-configservice/ConfigService.sln', 
 			'E:/Documents/TPC/git/mobileframework-documentservice/DocumentService.sln', 
 			'E:/Documents/TPC/git/mobileframework-identitymanagementservice/IdentityManagementService.sln', 
@@ -48,14 +49,17 @@ module.exports = function() {
 				},
 				{
 					base: 'E:/Documents/TPC/git/mobileframework-sharedcomponents/',
-					destination: 'sharedcomponents/'
+					destination: 'Shared/'
 				},
 				{
 					base: 'E:/Documents/TPC/git/mobileframework-storeinformationsystem/StoreInformation/public/',
 					destination: 'storeinformation/'
 			}
 			],
-			files: '**/*.*'
+			files: '**/*.*',
+			modules: '**/*.module.js',
+			js:'**/*.js',
+			lib: 'lib/**/*.js'
 		}
 	};
 

@@ -19,6 +19,8 @@ var rev = require('gulp-rev');
 var revreplace = require('gulp-rev-replace');
 var msbuild = require("gulp-msbuild");
 var merge = require('merge-stream');
+var filter = require('gulp-filter');
+var useref = require('gulp-useref');
 
 gulp.task('vet', ['show-something'], function() {
 	log('Analyzing source with JSHint and JSCS');
@@ -144,6 +146,8 @@ gulp.task('clean-deploy', function() {
         .pipe(clean());
 });
 
+//*******************************//*****************************//******************
+
 /* Assumptions: 
 	1) You change the locations of the projects in gulp.config.ws
 	2) You have a profile to deploy called Custom
@@ -168,6 +172,26 @@ gulp.task("build-ws", ['clean-deploy'], function(route) {
 	return merge(tasks);
 });
 
+gulp.task('optimize-customjs2', ['build-clients'], function() {
+	log('Minify the JS to build folder')
+	var tasks = config.angularapps.folders.map(function(folder) {	
+		var sortedangular = [
+			folder.base + config.angularapps.modules, //first modules
+			folder.base + config.angularapps.js, //all the js
+			'!' + folder.base + config.angularapps.lib //except /lib
+		];
+		log(sortedangular);
+		return gulp
+			.src(sortedangular , {base: folder.base})
+			.pipe(plumber()) //error handling
+			.pipe(ngannotate())
+			.pipe(concat(folder.destination + config.minify.js))						
+			//.pipe(uglify({mangle: false}))
+			.pipe(gulp.dest(config.deploy))
+	});
+	return merge(tasks);
+});
+
 gulp.task('build-clients', ['build-ws'], function() {
 	log('Copying files to Deploy directory');
 	var tasks = config.angularapps.folders.map(function(folder) {
@@ -183,6 +207,25 @@ gulp.task('build-clients', ['build-ws'], function() {
 });
 
 gulp.task('build-deploy', ['build-clients']);
+
+gulp.task('optimize2', function() {
+	log('Bundeling in one file');
+	var tasks = config.angularapps.folders.map(function(folder) {	
+		//var folder = config.angularapps.folders[1];
+		log(config.deploy + folder.destination + 'index.html');
+		return gulp
+			.src(config.deploy + folder.destination + 'index.html')
+	        .pipe(useref({
+	        	transformPath: function(filePath) {
+                	return filePath.replace('shared','../Shared')
+            	}
+            }))
+	        .pipe(gulpif('*.js', uglify()))
+	        .pipe(gulpif('*.css', csso()))
+	        .pipe(gulp.dest(config.deploy + folder.destination));
+	});
+	return merge(tasks);
+});
 
 /////////////////////
 
